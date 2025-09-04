@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleIdentifier</key>
+	<string>&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;!DOCTYPE plist PUBLIC &quot;-//Apple//DTD PLIST 1.0//EN&quot; &quot;http://www.apple.com/DTDs/PropertyList-1.0.dtd&quot;&gt;
+&lt;plist version=&quot;1.0&quot;&gt;
+&lt;dict&gt;
+    &lt;!-- Основные ключи --&gt;
+    &lt;key&gt;CFBundleName&lt;/key&gt;
+    &lt;string&gt;$(PRODUCT_NAME)&lt;/string&gt;
+    
+    &lt;!-- Доступ к файлам (для FileImporter) --&gt;
+    &lt;key&gt;NSDocumentsFolderUsageDescription&lt;/key&gt;
+    &lt;string&gt;Приложению нужен доступ к файлам для конвертации аудио в ноты.&lt;/string&gt;
+    
+    &lt;!-- Доступ к микрофону (если будет запись) --&gt;
+    &lt;key&gt;NSMicrophoneUsageDescription&lt;/key&gt;
+    &lt;string&gt;Приложению нужен доступ к микрофону для анализа звука.&lt;/string&gt;
+&lt;/dict&gt;
+&lt;/plist&gt;</string>
+</dict>
+</plist>
