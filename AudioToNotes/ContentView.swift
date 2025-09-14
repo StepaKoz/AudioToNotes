@@ -7,55 +7,30 @@ struct ContentView: View {
     
     var body: some View {
         ZStack {
-            // Фоновый градиент
-            backgroundGradient
+            backgroundView
             
-            VStack(spacing: 20) {
-                // Заголовок
-                headerSection
-                
-                // Основной контент
+            VStack(spacing: 30) {
                 mainContentSection
                 
                 Spacer()
             }
-            .padding(.top, 30)
+            .padding(.top, 40)
         }
-        .frame(minWidth: 400, minHeight: 500)
+        .frame(minWidth: 450, minHeight: 600)
         .animation(.easeInOut, value: filePickerVM.audioFile)
         .animation(.easeInOut, value: filePickerVM.detectedNotes)
     }
     
-    // MARK: - Компоненты
-    
-    private var backgroundGradient: some View {
-        LinearGradient(
-            gradient: Gradient(colors: [ColorPalette.secondary.opacity(0.2), .white]),
-            startPoint: .topLeading,
-            endPoint: .bottomTrailing
-        )
-        .edgesIgnoringSafeArea(.all)
-    }
-    
-    private var headerSection: some View {
-        VStack(spacing: 8) {
-            Image(systemName: "waveform.path")
-                .font(.system(size: 42))
-                .foregroundColor(ColorPalette.primary)
-            
-            Text("Аудио в Ноты")
-                .font(.system(size: 28, weight: .bold, design: .rounded))
-            
-            Text("Загрузите аудиофайл для анализа")
-                .font(.subheadline)
-                .foregroundColor(.secondary)
-        }
+    private var backgroundView: some View {
+        ColorPalette.secondary
+            .opacity(0.95)
+            .edgesIgnoringSafeArea(.all)
     }
     
     private var mainContentSection: some View {
-        VStack(spacing: 24) {
+        VStack(spacing: 28) {
             FilePickerView(viewModel: filePickerVM)
-                .padding(.horizontal, 40)
+                .padding(.horizontal, 50)
             
             if let file = filePickerVM.audioFile {
                 fileInfoSection(file: file)
@@ -66,17 +41,19 @@ struct ContentView: View {
     }
     
     private func fileInfoSection(file: AudioFile) -> some View {
-        VStack(spacing: 12) {
+        VStack(spacing: 16) {
             Divider()
-                .background(ColorPalette.primary.opacity(0.3))
-                .padding(.horizontal, 40)
+                .background(ColorPalette.primary.opacity(0.4))
+                .padding(.horizontal, 50)
             
-            VStack(alignment: .leading, spacing: 8) {
+            VStack(alignment: .leading, spacing: 12) {
                 HStack {
                     Image(systemName: "checkmark.circle.fill")
-                        .foregroundColor(.green)
+                        .foregroundColor(ColorPalette.accent2)
+                        .font(.title3)
                     Text("Файл готов к анализу")
-                        .font(.headline)
+                        .font(.title3)
+                        .fontWeight(.semibold)
                 }
                 
                 fileInfoRow(icon: "info.circle", text: file.name)
@@ -84,15 +61,18 @@ struct ContentView: View {
                 fileInfoRow(icon: "waveform.path", text: "Частота: \(Int(file.sampleRate)) Гц")
                 fileInfoRow(icon: "speaker.wave.2", text: "Каналы: \(file.channelCount)")
             }
-            .padding()
-            .background(ColorPalette.secondary.opacity(0.2))
-            .cornerRadius(12)
-            .transition(.opacity.combined(with: .move(edge: .top)))
+
+            .padding(20)
+            .background(
+                RoundedRectangle(cornerRadius: 16)
+                    .fill(ColorPalette.secondary.opacity(0.8))
+                    .shadow(color: Color.black.opacity(0.3), radius: 8, x: 0, y: 4)
+            )
         }
     }
     
     private var analysisControlsSection: some View {
-        VStack(spacing: 16) {
+        VStack(spacing: 20) {
             Button(action: {
                 filePickerVM.analyzeAudio()
             }) {
@@ -100,26 +80,33 @@ struct ContentView: View {
                     if filePickerVM.isAnalyzing {
                         ProgressView()
                             .progressViewStyle(CircularProgressViewStyle(tint: .white))
+                            .scaleEffect(1.2)
                     }
                     Text(filePickerVM.isAnalyzing ? "Идет анализ..." : "Анализировать аудио")
+                        .font(.title3)
+                        .fontWeight(.medium)
                         .frame(maxWidth: .infinity)
                 }
-                .padding(.vertical, 12)
+                .padding(.vertical, 16)
+                .padding(.horizontal, 24)
             }
             .buttonStyle(.borderedProminent)
+            .tint(ColorPalette.primary)
             .disabled(filePickerVM.isAnalyzing)
-            .padding(.horizontal, 40)
+            .padding(.horizontal, 50)
             
             if filePickerVM.isAnalyzing {
                 VStack {
                     ProgressView(value: filePickerVM.analysisProgress, total: 1.0)
                         .progressViewStyle(LinearProgressViewStyle(tint: ColorPalette.primary))
+
+                        .scaleEffect(y: 1.5)
                     
                     Text("Анализ: \(Int(filePickerVM.analysisProgress * 100))%")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
+                        .font(.body)
+                        .foregroundColor(ColorPalette.accent3)
                 }
-                .padding(.horizontal, 40)
+                .padding(.horizontal, 50)
             }
         }
     }
@@ -127,19 +114,30 @@ struct ContentView: View {
     private var notesVisualizationSection: some View {
         Group {
             if !filePickerVM.detectedNotes.isEmpty {
-                VStack(spacing: 8) {
-                    Text("Обнаруженные ноты")
-                        .font(.headline)
-                    
-                    ScrollView {
-                        LazyVStack(spacing: 6) {
-                            ForEach(filePickerVM.detectedNotes) { note in
-                                NoteRowView(note: note)
+                VStack(spacing: 20) {
+                    VStack(spacing: 12) {
+                        Text("Обнаруженные ноты")
+                            .font(.title3)
+                            .fontWeight(.semibold)
+                            .foregroundColor(ColorPalette.accent3)
+                        
+                        ScrollView {
+                            LazyVStack(spacing: 10) {
+                                ForEach(filePickerVM.detectedNotes) { note in
+                                    NoteRowView(note: note)
+                                }
                             }
+                            .padding(.horizontal)
                         }
-                        .padding(.horizontal)
+                        .frame(height: 220)
+                        .background(
+                            RoundedRectangle(cornerRadius: 16)
+                                .fill(ColorPalette.secondary.opacity(0.8))
+                                .shadow(color: ColorPalette.accent.opacity(0.4), radius: 8, x: 0, y: 4)
+                        )
                     }
-                    .frame(height: 200)
+                    
+                    PianoView(detectedNotes: filePickerVM.detectedNotes)
                 }
                 .transition(.opacity)
             } else if filePickerVM.errorMessage != nil {
@@ -149,31 +147,40 @@ struct ContentView: View {
     }
     
     private var errorSection: some View {
-        VStack {
+        VStack(spacing: 12) {
             Image(systemName: "exclamationmark.triangle.fill")
                 .foregroundColor(ColorPalette.accent)
-                .font(.system(size: 24))
+                .font(.system(size: 28))
             
             Text(filePickerVM.errorMessage ?? "Неизвестная ошибка")
-                .foregroundColor(ColorPalette.accent)
+                .font(.body) 
+                .foregroundColor(ColorPalette.accent3)
                 .multilineTextAlignment(.center)
         }
-        .padding()
-        .background(ColorPalette.accent.opacity(0.1))
-        .cornerRadius(10)
-        .padding(.horizontal, 40)
+        .padding(20)
+        .background(
+            RoundedRectangle(cornerRadius: 12)
+                .fill(ColorPalette.accent.opacity(0.15))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 12)
+                        .stroke(ColorPalette.accent.opacity(0.4), lineWidth: 1.5)
+                )
+        )
+        .padding(.horizontal, 50)
     }
     
     private func fileInfoRow(icon: String, text: String) -> some View {
-        HStack(spacing: 8) {
+        HStack(spacing: 12) {
             Image(systemName: icon)
-                .frame(width: 20)
+                .frame(width: 24) 
+                .foregroundColor(ColorPalette.primary)
+                .font(.body)
             Text(text)
                 .lineLimit(1)
                 .truncationMode(.middle)
         }
-        .font(.caption)
-        .foregroundColor(.secondary)
+        .font(.body)
+        .foregroundColor(ColorPalette.accent3)
         .frame(maxWidth: .infinity, alignment: .leading)
     }
 }
